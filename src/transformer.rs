@@ -70,6 +70,15 @@ fn transform_return_type_to_ir<'a>(ty: &Type) -> IRType<'a> {
     }
 }
 
+fn transform_return_to_ir<'a>(ret_expr: &'a syn::ExprReturn) -> IRNode<'a> {
+    let value = ret_expr
+        .expr
+        .as_ref()
+        .map(|expr| Box::new(transform_expr_to_ir(expr)));
+
+    IRNode::Return { value }
+}
+
 fn transform_stmt_to_ir<'a>(stmt: &'a Stmt) -> IRNode<'a> {
     match stmt {
         Stmt::Local(local) => {
@@ -87,8 +96,9 @@ fn transform_stmt_to_ir<'a>(stmt: &'a Stmt) -> IRNode<'a> {
         }
 
         Stmt::Expr(expr, _) => transform_expr_to_ir(expr),
+        Stmt::Item(item) => transform_item_to_ir(item),
 
-        _ => unimplemented!(),
+        _ => panic!("Unsupported statement type: {:?}", stmt),
     }
 }
 
@@ -123,6 +133,51 @@ fn transform_expr_to_ir<'a>(expr: &'a Expr) -> IRNode<'a> {
             }
         }
 
-        _ => unimplemented!(),
+        Expr::Return(ret_expr) => transform_return_to_ir(ret_expr),
+        Expr::Binary(expr_binary) => {
+            let left = Box::new(transform_expr_to_ir(&expr_binary.left));
+            let right = Box::new(transform_expr_to_ir(&expr_binary.right));
+            let op = match &expr_binary.op {
+                syn::BinOp::Add(_) => "+",
+                syn::BinOp::Sub(_) => "-",
+                syn::BinOp::Mul(_) => "*",
+                syn::BinOp::Div(_) => "/",
+                syn::BinOp::Rem(_) => "%",
+                syn::BinOp::And(_) => "&&",
+                syn::BinOp::Or(_) => "||",
+                syn::BinOp::BitXor(_) => "^",
+                syn::BinOp::BitAnd(_) => "&",
+                syn::BinOp::BitOr(_) => "|",
+                syn::BinOp::Shl(_) => "<<",
+                syn::BinOp::Shr(_) => ">>",
+                syn::BinOp::Eq(_) => "==",
+                syn::BinOp::Lt(_) => "<",
+                syn::BinOp::Le(_) => "<=",
+                syn::BinOp::Ne(_) => "!=",
+                syn::BinOp::Ge(_) => ">=",
+                syn::BinOp::Gt(_) => ">",
+                _ => panic!("Unsupported binary operator"),
+            };
+
+            IRNode::BinaryOp {
+                op: Box::leak(op.to_string().into_boxed_str()),
+                left,
+                right,
+            }
+        }
+
+        Expr::Path(expr_path) => {
+            let path_str = expr_path
+                .path
+                .segments
+                .iter()
+                .map(|seg| seg.ident.to_string())
+                .collect::<Vec<_>>()
+                .join("::");
+
+            IRNode::Value(Box::leak(path_str.into_boxed_str()))
+        }
+
+        _ => panic!("Unsupported expression type: {:?}", expr),
     }
 }
