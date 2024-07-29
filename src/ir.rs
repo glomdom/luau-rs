@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 #[derive(Debug)]
 pub enum IRNode<'a> {
     Function {
@@ -5,6 +7,10 @@ pub enum IRNode<'a> {
         params: Vec<IRParam<'a>>,
         ret_type: Option<IRType<'a>>,
         body: Vec<IRNode<'a>>,
+    },
+
+    Return {
+        value: Option<Box<IRNode<'a>>>,
     },
 
     Let {
@@ -15,6 +21,12 @@ pub enum IRNode<'a> {
     Call {
         func: &'a str,
         args: Vec<IRNode<'a>>,
+    },
+
+    BinaryOp {
+        op: &'a str,
+        left: Box<IRNode<'a>>,
+        right: Box<IRNode<'a>>,
     },
 
     Value(&'a str),
