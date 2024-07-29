@@ -1,20 +1,22 @@
 use quote::quote;
 use syn::File;
 
+mod generator;
+mod ir;
 mod parser;
 mod transformer;
-mod generator;
 
 fn main() {
     let code = quote! {
         fn main() {
             let x = 10;
-
-            println!("Hello, World!");
         }
     };
 
     let ast: File = syn::parse2(code).expect("failed to parse ast");
 
-    println!("{:#?}", ast);
+    for item in ast.items {
+        let ir = transformer::transform_item_to_ir(&item);
+        println!("{:#?}", ir);
+    }
 }
