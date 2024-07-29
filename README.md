@@ -1,7 +1,20 @@
 # roblox-rs
 
-why am i doing this
+Rust to Luau compiler. Heavy inspiration from [roblox-ts](https://roblox-ts.com/)
 
-## description
+Current state is mapping rust AST to a custom IR which will ease Luau rendering.
 
-roblox to luau compiler but its better than roblox-ts (facts)
+## roadmap
+
+In no particular order:
+- [x] functions
+- [ ] returning
+  - [x] explicit
+  - [ ] implicit (how do i implement this)
+- [x] function params
+  - [ ] generics
+  - [ ] map types to luau types
+  - [ ] potential struct types
+- [ ] structs
+  - [ ] impl
+- [ ] traits
