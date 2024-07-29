@@ -3,6 +3,7 @@ pub enum IRNode<'a> {
     Function {
         name: &'a str,
         params: Vec<IRParam<'a>>,
+        ret_type: Option<IRType<'a>>,
         body: Vec<IRNode<'a>>,
     },
 
@@ -29,4 +30,9 @@ pub struct IRParam<'a> {
 pub struct IRField<'a> {
     pub name: &'a str,
     pub typ: &'a str,
+}
+
+#[derive(Debug)]
+pub struct IRType<'a> {
+    pub type_name: &'a str,
 }
