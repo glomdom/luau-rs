@@ -1,5 +1,5 @@
-use crate::ir::{IRNode, IRParam};
-use syn::{Expr, FnArg, Item, ItemFn, Lit, LocalInit, Pat, PatType, Stmt, Type};
+use crate::ir::{IRNode, IRParam, IRType};
+use syn::{Expr, FnArg, Item, ItemFn, Lit, LocalInit, Pat, PatType, ReturnType, Stmt, Type};
 
 pub fn transform_item_to_ir<'a>(item: &'a Item) -> IRNode<'a> {
     match item {
@@ -13,6 +13,11 @@ pub fn transform_fn_to_ir<'a>(item_fn: &'a ItemFn) -> IRNode<'a> {
     let name = item_fn.sig.ident.to_string();
     let name_ref: &'a str = Box::leak(name.into_boxed_str());
 
+    let ret_type = match &item_fn.sig.output {
+        ReturnType::Default => None,
+        ReturnType::Type(_, ty) => Some(transform_return_type_to_ir(ty)),
+    };
+
     IRNode::Function {
         name: name_ref,
         params: item_fn
@@ -22,6 +27,7 @@ pub fn transform_fn_to_ir<'a>(item_fn: &'a ItemFn) -> IRNode<'a> {
             .map(transform_param_to_ir)
             .collect(),
 
+        ret_type,
         body: item_fn
             .block
             .stmts
@@ -55,6 +61,12 @@ fn extract_type_name(ty: &Type) -> String {
         Type::Path(type_path) => type_path.path.segments.last().unwrap().ident.to_string(),
 
         _ => unimplemented!(),
+    }
+}
+
+fn transform_return_type_to_ir<'a>(ty: &Type) -> IRType<'a> {
+    IRType {
+        type_name: Box::leak(extract_type_name(ty).into_boxed_str()),
     }
 }
 
