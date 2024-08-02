@@ -8,7 +8,7 @@ mod transformer;
 
 fn main() {
     let code = quote! {
-        fn main() {
+        fn main() -> int {
             let x = 10;
 
             x == 2
