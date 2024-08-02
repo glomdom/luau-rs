@@ -13,7 +13,8 @@ In no particular order:
   - [x] implicit
 - [x] function params
   - [ ] generics
-  - [ ] map types to luau types
+  - [ ] parameters
+    - [ ] map types to luau types
   - [ ] struct types?
 - [ ] structs
   - [ ] impl
