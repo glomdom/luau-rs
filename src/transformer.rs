@@ -27,13 +27,30 @@ pub fn transform_fn_to_ir(item_fn: &ItemFn) -> IRNode {
             .map(transform_param_to_ir)
             .collect(),
         ret_type,
-        body: item_fn
-            .block
-            .stmts
-            .iter()
-            .map(transform_stmt_to_ir)
-            .collect(),
+        body: transform_block_to_ir(&item_fn.block.stmts)
     }
+}
+
+fn transform_block_to_ir(stmts: &[Stmt]) -> Vec<IRNode> {
+    let mut ir_nodes = vec![];
+
+    for (i, stmt) in stmts.iter().enumerate() {
+        let is_last = i == stmts.len() - 1;
+
+        if let Stmt::Expr(expr, None) = stmt {
+            if is_last {
+                ir_nodes.push(IRNode::Return {
+                    value: Some(Box::new(transform_expr_to_ir(expr))),
+                });
+            } else {
+                ir_nodes.push(transform_expr_to_ir(expr));
+            }
+        } else {
+            ir_nodes.push(transform_stmt_to_ir(&stmt));
+        }
+    }
+
+    ir_nodes
 }
 
 fn transform_param_to_ir(arg: &FnArg) -> IRParam {
