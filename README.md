@@ -8,13 +8,13 @@ Current state is mapping rust AST to a custom IR which will ease Luau rendering.
 
 In no particular order:
 - [x] functions
-- [ ] returning
+- [x] returning
   - [x] explicit
-  - [ ] implicit (how do i implement this)
+  - [x] implicit
 - [x] function params
   - [ ] generics
   - [ ] map types to luau types
-  - [ ] potential struct types
+  - [ ] struct types?
 - [ ] structs
   - [ ] impl
 - [ ] traits
