@@ -1,7 +1,9 @@
 use crate::ir::{IRNode, IRParam, IRType};
-use syn::{Expr, FnArg, Item, ItemFn, Lit, LocalInit, Pat, PatType, ReturnType, Stmt, Type};
+use syn::{
+    Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type,
+};
 
-pub fn transform_item_to_ir<'a>(item: &'a Item) -> IRNode<'a> {
+pub fn transform_item_to_ir(item: &Item) -> IRNode {
     match item {
         Item::Fn(item_fn) => transform_fn_to_ir(item_fn),
 
@@ -9,24 +11,21 @@ pub fn transform_item_to_ir<'a>(item: &'a Item) -> IRNode<'a> {
     }
 }
 
-pub fn transform_fn_to_ir<'a>(item_fn: &'a ItemFn) -> IRNode<'a> {
+pub fn transform_fn_to_ir(item_fn: &ItemFn) -> IRNode {
     let name = item_fn.sig.ident.to_string();
-    let name_ref: &'a str = Box::leak(name.into_boxed_str());
-
     let ret_type = match &item_fn.sig.output {
         ReturnType::Default => None,
         ReturnType::Type(_, ty) => Some(transform_return_type_to_ir(ty)),
     };
 
     IRNode::Function {
-        name: name_ref,
+        name,
         params: item_fn
             .sig
             .inputs
             .iter()
             .map(transform_param_to_ir)
             .collect(),
-
         ret_type,
         body: item_fn
             .block
@@ -37,22 +36,24 @@ pub fn transform_fn_to_ir<'a>(item_fn: &'a ItemFn) -> IRNode<'a> {
     }
 }
 
-fn transform_param_to_ir<'a>(arg: &'a FnArg) -> IRParam<'a> {
+fn transform_param_to_ir(arg: &FnArg) -> IRParam {
     match arg {
-        FnArg::Typed(PatType { pat, ty, .. }) => IRParam {
-            name: Box::leak(extract_pat_ident_name(pat).into_boxed_str()),
-            typ: Box::leak(extract_type_name(ty).into_boxed_str()),
-        },
+        FnArg::Typed(pat_type) => {
+            let name = extract_pat_ident_name(&pat_type.pat);
+            let typ = extract_type_name(&pat_type.ty);
+
+            IRParam { name, typ }
+        }
 
         _ => unimplemented!(),
     }
 }
 
 fn extract_pat_ident_name(pat: &Pat) -> String {
-    if let Pat::Ident(ref ident) = pat {
-        ident.ident.to_string()
-    } else {
-        unimplemented!()
+    match pat {
+        Pat::Ident(ident) => ident.ident.to_string(),
+
+        _ => unimplemented!(),
     }
 }
 
@@ -64,13 +65,13 @@ fn extract_type_name(ty: &Type) -> String {
     }
 }
 
-fn transform_return_type_to_ir<'a>(ty: &Type) -> IRType<'a> {
+fn transform_return_type_to_ir(ty: &Type) -> IRType {
     IRType {
-        type_name: Box::leak(extract_type_name(ty).into_boxed_str()),
+        type_name: extract_type_name(ty),
     }
 }
 
-fn transform_return_to_ir<'a>(ret_expr: &'a syn::ExprReturn) -> IRNode<'a> {
+fn transform_return_to_ir(ret_expr: &ExprReturn) -> IRNode {
     let value = ret_expr
         .expr
         .as_ref()
@@ -79,36 +80,33 @@ fn transform_return_to_ir<'a>(ret_expr: &'a syn::ExprReturn) -> IRNode<'a> {
     IRNode::Return { value }
 }
 
-fn transform_stmt_to_ir<'a>(stmt: &'a Stmt) -> IRNode<'a> {
+fn transform_stmt_to_ir(stmt: &Stmt) -> IRNode {
     match stmt {
         Stmt::Local(local) => {
-            let pat_name = extract_pat_ident_name(&local.pat).into_boxed_str();
-            let init_expr = if let Some(LocalInit { expr, .. }) = &local.init {
-                transform_expr_to_ir(expr)
-            } else {
-                IRNode::Value("")
-            };
+            let name = extract_pat_ident_name(&local.pat);
+            let expr = local.init.as_ref().map_or_else(
+                || IRNode::Value("".to_string()),
+                |init| transform_expr_to_ir(&init.expr),
+            );
 
             IRNode::Let {
-                name: Box::leak(pat_name),
-                expr: Box::new(init_expr),
+                name,
+                expr: Box::new(expr),
             }
         }
 
-        Stmt::Expr(expr, _) => transform_expr_to_ir(expr),
+        Stmt::Expr(expr, _semi) => transform_expr_to_ir(expr),
         Stmt::Item(item) => transform_item_to_ir(item),
 
         _ => panic!("Unsupported statement type: {:?}", stmt),
     }
 }
 
-fn transform_expr_to_ir<'a>(expr: &'a Expr) -> IRNode<'a> {
+fn transform_expr_to_ir(expr: &Expr) -> IRNode {
     match expr {
         Expr::Lit(expr_lit) => {
             if let Lit::Int(lit_int) = &expr_lit.lit {
-                IRNode::Value(Box::leak(
-                    lit_int.base10_digits().to_string().into_boxed_str(),
-                ))
+                IRNode::Value(lit_int.base10_digits().to_string())
             } else {
                 unimplemented!()
             }
@@ -121,14 +119,10 @@ fn transform_expr_to_ir<'a>(expr: &'a Expr) -> IRNode<'a> {
                 unimplemented!()
             };
 
-            let args = expr_call
-                .args
-                .iter()
-                .map(|arg| transform_expr_to_ir(arg))
-                .collect();
+            let args = expr_call.args.iter().map(transform_expr_to_ir).collect();
 
             IRNode::Call {
-                func: Box::leak(func_name.into_boxed_str()),
+                func: func_name,
                 args,
             }
         }
@@ -138,32 +132,29 @@ fn transform_expr_to_ir<'a>(expr: &'a Expr) -> IRNode<'a> {
             let left = Box::new(transform_expr_to_ir(&expr_binary.left));
             let right = Box::new(transform_expr_to_ir(&expr_binary.right));
             let op = match &expr_binary.op {
-                syn::BinOp::Add(_) => "+",
-                syn::BinOp::Sub(_) => "-",
-                syn::BinOp::Mul(_) => "*",
-                syn::BinOp::Div(_) => "/",
-                syn::BinOp::Rem(_) => "%",
-                syn::BinOp::And(_) => "&&",
-                syn::BinOp::Or(_) => "||",
-                syn::BinOp::BitXor(_) => "^",
-                syn::BinOp::BitAnd(_) => "&",
-                syn::BinOp::BitOr(_) => "|",
-                syn::BinOp::Shl(_) => "<<",
-                syn::BinOp::Shr(_) => ">>",
-                syn::BinOp::Eq(_) => "==",
-                syn::BinOp::Lt(_) => "<",
-                syn::BinOp::Le(_) => "<=",
-                syn::BinOp::Ne(_) => "!=",
-                syn::BinOp::Ge(_) => ">=",
-                syn::BinOp::Gt(_) => ">",
+                syn::BinOp::Add(_) => "+".to_string(),
+                syn::BinOp::Sub(_) => "-".to_string(),
+                syn::BinOp::Mul(_) => "*".to_string(),
+                syn::BinOp::Div(_) => "/".to_string(),
+                syn::BinOp::Rem(_) => "%".to_string(),
+                syn::BinOp::And(_) => "&&".to_string(),
+                syn::BinOp::Or(_) => "||".to_string(),
+                syn::BinOp::BitXor(_) => "^".to_string(),
+                syn::BinOp::BitAnd(_) => "&".to_string(),
+                syn::BinOp::BitOr(_) => "|".to_string(),
+                syn::BinOp::Shl(_) => "<<".to_string(),
+                syn::BinOp::Shr(_) => ">>".to_string(),
+                syn::BinOp::Eq(_) => "==".to_string(),
+                syn::BinOp::Lt(_) => "<".to_string(),
+                syn::BinOp::Le(_) => "<=".to_string(),
+                syn::BinOp::Ne(_) => "!=".to_string(),
+                syn::BinOp::Ge(_) => ">=".to_string(),
+                syn::BinOp::Gt(_) => ">".to_string(),
+
                 _ => panic!("Unsupported binary operator"),
             };
 
-            IRNode::BinaryOp {
-                op: Box::leak(op.to_string().into_boxed_str()),
-                left,
-                right,
-            }
+            IRNode::BinaryOp { op, left, right }
         }
 
         Expr::Path(expr_path) => {
@@ -175,7 +166,7 @@ fn transform_expr_to_ir<'a>(expr: &'a Expr) -> IRNode<'a> {
                 .collect::<Vec<_>>()
                 .join("::");
 
-            IRNode::Value(Box::leak(path_str.into_boxed_str()))
+            IRNode::Value(path_str)
         }
 
         _ => panic!("Unsupported expression type: {:?}", expr),

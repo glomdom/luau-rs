@@ -1,50 +1,50 @@
 #![allow(dead_code)]
 
 #[derive(Debug)]
-pub enum IRNode<'a> {
+pub enum IRNode {
     Function {
-        name: &'a str,
-        params: Vec<IRParam<'a>>,
-        ret_type: Option<IRType<'a>>,
-        body: Vec<IRNode<'a>>,
+        name: String,
+        params: Vec<IRParam>,
+        ret_type: Option<IRType>,
+        body: Vec<IRNode>,
     },
 
     Return {
-        value: Option<Box<IRNode<'a>>>,
+        value: Option<Box<IRNode>>,
     },
 
     Let {
-        name: &'a str,
-        expr: Box<IRNode<'a>>,
+        name: String,
+        expr: Box<IRNode>,
     },
 
     Call {
-        func: &'a str,
-        args: Vec<IRNode<'a>>,
+        func: String,
+        args: Vec<IRNode>,
     },
 
     BinaryOp {
-        op: &'a str,
-        left: Box<IRNode<'a>>,
-        right: Box<IRNode<'a>>,
+        op: String,
+        left: Box<IRNode>,
+        right: Box<IRNode>,
     },
 
-    Value(&'a str),
+    Value(String),
 }
 
 #[derive(Debug)]
-pub struct IRParam<'a> {
-    pub name: &'a str,
-    pub typ: &'a str,
+pub struct IRParam {
+    pub name: String,
+    pub typ: String,
 }
 
 #[derive(Debug)]
-pub struct IRField<'a> {
-    pub name: &'a str,
-    pub typ: &'a str,
+pub struct IRField {
+    pub name: String,
+    pub typ: String,
 }
 
 #[derive(Debug)]
-pub struct IRType<'a> {
-    pub type_name: &'a str,
+pub struct IRType {
+    pub type_name: String,
 }
