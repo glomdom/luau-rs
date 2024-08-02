@@ -11,7 +11,7 @@ fn main() {
         fn main() {
             let x = 10;
 
-            return x == 2;
+            x == 2
         }
     };
 
