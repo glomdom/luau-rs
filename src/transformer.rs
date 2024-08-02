@@ -57,7 +57,7 @@ fn transform_param_to_ir(arg: &FnArg) -> IRParam {
     match arg {
         FnArg::Typed(pat_type) => {
             let name = extract_pat_ident_name(&pat_type.pat);
-            let typ = extract_type_name(&pat_type.ty);
+            let typ = map_rust_type_to_luau(&pat_type.ty);
 
             IRParam { name, typ }
         }
@@ -74,17 +74,27 @@ fn extract_pat_ident_name(pat: &Pat) -> String {
     }
 }
 
-fn extract_type_name(ty: &Type) -> String {
+fn map_rust_type_to_luau(ty: &Type) -> String {
     match ty {
-        Type::Path(type_path) => type_path.path.segments.last().unwrap().ident.to_string(),
+        Type::Path(type_path) => {
+            let type_name = type_path.path.segments.last().unwrap().ident.to_string();
 
-        _ => unimplemented!(),
+            match type_name.as_str() {
+                "i32" | "i64" | "u32" | "u64" | "f32" | "f64" => "number".to_string(),
+                "bool" => "boolean".to_string(),
+                "String" | "&str" => "string".to_string(),
+
+                _ => type_name,
+            }
+        }
+
+        _ => panic!(":( expected Type::Path but got {:?}", ty),
     }
 }
 
 fn transform_return_type_to_ir(ty: &Type) -> IRType {
     IRType {
-        type_name: extract_type_name(ty),
+        type_name: map_rust_type_to_luau(ty),
     }
 }
 
