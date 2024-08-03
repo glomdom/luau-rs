@@ -29,6 +29,15 @@ pub enum LuauNode {
         right: Box<LuauNode>,
     },
 
+    Ref {
+        name: String,
+        mutable: bool,
+    },
+
+    Deref {
+        expr: Box<LuauNode>,
+    },
+
     Value(String),
 }
 

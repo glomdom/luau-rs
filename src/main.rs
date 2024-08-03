@@ -11,7 +11,11 @@ fn main() {
         fn main(a: i32, b: String, c: f64) -> i32 {
             let x = 10;
 
-            x == 2
+            sigma(10);
+        }
+
+        fn sigma(a: &i32) -> i32 {
+            a * 2
         }
     };
 
