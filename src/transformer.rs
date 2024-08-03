@@ -1,65 +1,65 @@
-use crate::ir::{IRNode, IRParam, IRType};
+use crate::luau::{LuauNode, LuauParam, LuauType};
 use syn::{
     Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type,
 };
 
-pub fn transform_item_to_ir(item: &Item) -> IRNode {
+pub fn transform_item_to_luau(item: &Item) -> LuauNode {
     match item {
-        Item::Fn(item_fn) => transform_fn_to_ir(item_fn),
+        Item::Fn(item_fn) => transform_fn_to_luau(item_fn),
 
         _ => unimplemented!(),
     }
 }
 
-pub fn transform_fn_to_ir(item_fn: &ItemFn) -> IRNode {
+pub fn transform_fn_to_luau(item_fn: &ItemFn) -> LuauNode {
     let name = item_fn.sig.ident.to_string();
     let ret_type = match &item_fn.sig.output {
         ReturnType::Default => None,
-        ReturnType::Type(_, ty) => Some(transform_return_type_to_ir(ty)),
+        ReturnType::Type(_, ty) => Some(transform_return_type_to_luau(ty)),
     };
 
-    IRNode::Function {
+    LuauNode::Function {
         name,
         params: item_fn
             .sig
             .inputs
             .iter()
-            .map(transform_param_to_ir)
+            .map(transform_param_to_luau)
             .collect(),
         ret_type,
-        body: transform_block_to_ir(&item_fn.block.stmts)
+        body: transform_block_to_luau(&item_fn.block.stmts)
     }
 }
 
-fn transform_block_to_ir(stmts: &[Stmt]) -> Vec<IRNode> {
-    let mut ir_nodes = vec![];
+fn transform_block_to_luau(stmts: &[Stmt]) -> Vec<LuauNode> {
+    let mut luau_nodes = vec![];
 
     for (i, stmt) in stmts.iter().enumerate() {
         let is_last = i == stmts.len() - 1;
 
         if let Stmt::Expr(expr, None) = stmt {
             if is_last {
-                ir_nodes.push(IRNode::Return {
-                    value: Some(Box::new(transform_expr_to_ir(expr))),
+                luau_nodes.push(LuauNode::Return {
+                    value: Some(Box::new(transform_expr_to_luau(expr))),
                 });
             } else {
-                ir_nodes.push(transform_expr_to_ir(expr));
+                luau_nodes.push(transform_expr_to_luau(expr));
             }
         } else {
-            ir_nodes.push(transform_stmt_to_ir(&stmt));
+            luau_nodes.push(transform_stmt_to_luau(&stmt));
         }
     }
 
-    ir_nodes
+    luau_nodes
 }
 
-fn transform_param_to_ir(arg: &FnArg) -> IRParam {
+fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
     match arg {
         FnArg::Typed(pat_type) => {
             let name = extract_pat_ident_name(&pat_type.pat);
             let typ = map_rust_type_to_luau(&pat_type.ty);
 
-            IRParam { name, typ }
+            LuauParam { name, typ }
         }
 
         _ => unimplemented!(),
@@ -92,48 +92,48 @@ fn map_rust_type_to_luau(ty: &Type) -> String {
     }
 }
 
-fn transform_return_type_to_ir(ty: &Type) -> IRType {
-    IRType {
+fn transform_return_type_to_luau(ty: &Type) -> LuauType {
+    LuauType {
         type_name: map_rust_type_to_luau(ty),
     }
 }
 
-fn transform_return_to_ir(ret_expr: &ExprReturn) -> IRNode {
+fn transform_return_to_luau(ret_expr: &ExprReturn) -> LuauNode {
     let value = ret_expr
         .expr
         .as_ref()
-        .map(|expr| Box::new(transform_expr_to_ir(expr)));
+        .map(|expr| Box::new(transform_expr_to_luau(expr)));
 
-    IRNode::Return { value }
+    LuauNode::Return { value }
 }
 
-fn transform_stmt_to_ir(stmt: &Stmt) -> IRNode {
+fn transform_stmt_to_luau(stmt: &Stmt) -> LuauNode {
     match stmt {
         Stmt::Local(local) => {
             let name = extract_pat_ident_name(&local.pat);
             let expr = local.init.as_ref().map_or_else(
-                || IRNode::Value("".to_string()),
-                |init| transform_expr_to_ir(&init.expr),
+                || LuauNode::Value("".to_string()),
+                |init| transform_expr_to_luau(&init.expr),
             );
 
-            IRNode::Let {
+            LuauNode::Let {
                 name,
                 expr: Box::new(expr),
             }
         }
 
-        Stmt::Expr(expr, _semi) => transform_expr_to_ir(expr),
-        Stmt::Item(item) => transform_item_to_ir(item),
+        Stmt::Expr(expr, _semi) => transform_expr_to_luau(expr),
+        Stmt::Item(item) => transform_item_to_luau(item),
 
         _ => panic!("Unsupported statement type: {:?}", stmt),
     }
 }
 
-fn transform_expr_to_ir(expr: &Expr) -> IRNode {
+fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
     match expr {
         Expr::Lit(expr_lit) => {
             if let Lit::Int(lit_int) = &expr_lit.lit {
-                IRNode::Value(lit_int.base10_digits().to_string())
+                LuauNode::Value(lit_int.base10_digits().to_string())
             } else {
                 unimplemented!()
             }
@@ -146,18 +146,18 @@ fn transform_expr_to_ir(expr: &Expr) -> IRNode {
                 unimplemented!()
             };
 
-            let args = expr_call.args.iter().map(transform_expr_to_ir).collect();
+            let args = expr_call.args.iter().map(transform_expr_to_luau).collect();
 
-            IRNode::Call {
+            LuauNode::Call {
                 func: func_name,
                 args,
             }
         }
 
-        Expr::Return(ret_expr) => transform_return_to_ir(ret_expr),
+        Expr::Return(ret_expr) => transform_return_to_luau(ret_expr),
         Expr::Binary(expr_binary) => {
-            let left = Box::new(transform_expr_to_ir(&expr_binary.left));
-            let right = Box::new(transform_expr_to_ir(&expr_binary.right));
+            let left = Box::new(transform_expr_to_luau(&expr_binary.left));
+            let right = Box::new(transform_expr_to_luau(&expr_binary.right));
             let op = match &expr_binary.op {
                 syn::BinOp::Add(_) => "+".to_string(),
                 syn::BinOp::Sub(_) => "-".to_string(),
@@ -181,7 +181,7 @@ fn transform_expr_to_ir(expr: &Expr) -> IRNode {
                 _ => panic!("Unsupported binary operator"),
             };
 
-            IRNode::BinaryOp { op, left, right }
+            LuauNode::BinaryOp { op, left, right }
         }
 
         Expr::Path(expr_path) => {
@@ -193,7 +193,7 @@ fn transform_expr_to_ir(expr: &Expr) -> IRNode {
                 .collect::<Vec<_>>()
                 .join("::");
 
-            IRNode::Value(path_str)
+            LuauNode::Value(path_str)
         }
 
         _ => panic!("Unsupported expression type: {:?}", expr),

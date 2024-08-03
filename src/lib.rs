@@ -1,4 +1,4 @@
 pub mod generator;
-pub mod ir;
+pub mod luau;
 pub mod parser;
 pub mod transformer;
