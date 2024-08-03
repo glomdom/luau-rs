@@ -6,13 +6,13 @@ pub enum LuauNode {
         name: String,
         params: Vec<LuauParam>,
         ret_type: Option<LuauType>,
-        body: Vec<LuauNode>,
+        body: Box<LuauNode>,
     },
 
     If {
         condition: Box<LuauNode>,
         then_branch: Vec<LuauNode>,
-        else_branch: Option<Vec<LuauNode>>,
+        else_branch: Option<Box<LuauNode>>,
     },
 
     Return {
@@ -33,6 +33,10 @@ pub enum LuauNode {
         op: String,
         left: Box<LuauNode>,
         right: Box<LuauNode>,
+    },
+
+    Block {
+        statements: Vec<LuauNode>,
     },
 
     Ref {

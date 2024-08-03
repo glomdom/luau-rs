@@ -1,5 +1,8 @@
 use crate::luau::{LuauNode, LuauParam, LuauType};
-use syn::{BinOp, Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type, UnOp};
+use syn::{
+    BinOp, Block, Expr, ExprIf, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type,
+    UnOp,
+};
 
 pub fn transform_item_to_luau(item: &Item) -> LuauNode {
     match item {
@@ -25,11 +28,12 @@ pub fn transform_fn_to_luau(item_fn: &ItemFn) -> LuauNode {
             .map(transform_param_to_luau)
             .collect(),
         ret_type,
-        body: transform_block_to_luau(&item_fn.block.stmts),
+        body: Box::new(transform_block_to_luau(&item_fn.block)),
     }
 }
 
-fn transform_block_to_luau(stmts: &[Stmt]) -> Vec<LuauNode> {
+fn transform_block_to_luau(block: &Block) -> LuauNode {
+    let stmts = &block.stmts;
     let mut luau_nodes = vec![];
 
     for (i, stmt) in stmts.iter().enumerate() {
@@ -37,9 +41,7 @@ fn transform_block_to_luau(stmts: &[Stmt]) -> Vec<LuauNode> {
 
         if let Stmt::Expr(expr, None) = stmt {
             if is_last {
-                luau_nodes.push(LuauNode::Return {
-                    value: Some(Box::new(transform_expr_to_luau(expr))),
-                });
+                luau_nodes.push(transform_expr_to_luau(expr));
             } else {
                 luau_nodes.push(transform_expr_to_luau(expr));
             }
@@ -48,7 +50,7 @@ fn transform_block_to_luau(stmts: &[Stmt]) -> Vec<LuauNode> {
         }
     }
 
-    luau_nodes
+    LuauNode::Block { statements: luau_nodes }
 }
 
 fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
@@ -137,6 +139,28 @@ fn transform_stmt_to_luau(stmt: &Stmt) -> LuauNode {
 
         _ => panic!("unsupported statement type: {:?}", stmt),
     }
+}
+
+fn transform_if_expr(expr_if: &ExprIf) -> LuauNode {
+    let condition = transform_expr_to_luau(&expr_if.cond);
+    let then_branch = match transform_block_to_luau(&expr_if.then_branch) {
+        LuauNode::Block { statements } => statements,
+
+        _ => panic!("expected a block"),
+    };
+
+    let else_branch = if let Some((_, else_expr)) = &expr_if.else_branch {
+        match else_expr.as_ref() {
+            Expr::If(expr_if) => Some(Box::new(transform_if_expr(expr_if))),
+            Expr::Block(expr_block) => Some(Box::new(transform_block_to_luau(&expr_block.block))),
+
+            _ => None,
+        }
+    } else {
+        None
+    };
+
+    LuauNode::If { condition: Box::new(condition), then_branch, else_branch }
 }
 
 fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
@@ -228,6 +252,9 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
                 unimplemented!()
             }
         }
+
+        Expr::Block(expr_block) => transform_block_to_luau(&expr_block.block),
+        Expr::If(expr_if) => transform_if_expr(expr_if),
 
         _ => panic!("unsupported expression type: {:?}", expr),
     }

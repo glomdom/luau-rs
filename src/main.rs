@@ -9,10 +9,16 @@ fn main() {
     let code = quote! {
         fn main(a: i32, b: String, c: f64) -> i32 {
             let x = 10;
-
-            sigma(&x)
+        
+            if x == 10 {
+                sigma(&x)
+            } else if x == 20 {
+                sigma(&x)
+            } else {
+                sigma(&x)
+            }
         }
-
+        
         fn sigma(a: &i32) -> i32 {
             *a * 2
         }
