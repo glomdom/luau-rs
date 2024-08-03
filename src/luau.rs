@@ -9,6 +9,12 @@ pub enum LuauNode {
         body: Vec<LuauNode>,
     },
 
+    If {
+        condition: Box<LuauNode>,
+        then_branch: Vec<LuauNode>,
+        else_branch: Option<Vec<LuauNode>>,
+    },
+
     Return {
         value: Option<Box<LuauNode>>,
     },
