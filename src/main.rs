@@ -2,7 +2,7 @@ use quote::quote;
 use syn::File;
 
 mod generator;
-mod ir;
+mod luau;
 mod parser;
 mod transformer;
 
@@ -15,11 +15,9 @@ fn main() {
         }
     };
 
-    let ast: File = syn::parse2(code).expect("failed to parse ast");
-
+    let ast: File = syn::parse2(code).expect("failed to parse source ast");
     for item in ast.items {
-        let ir = transformer::transform_item_to_ir(&item);
-
-        println!("{:#?}", ir);
+        let luau = transformer::transform_item_to_luau(&item);
+        println!("{:#?}", luau);
     }
 }
