@@ -1,6 +1,6 @@
 use crate::luau::{LuauNode, LuauParam, LuauType};
 use syn::{
-    Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type,
+    Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type, UnOp,
 };
 
 pub fn transform_item_to_luau(item: &Item) -> LuauNode {
@@ -60,9 +60,10 @@ fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
             let typ = map_rust_type_to_luau(&pat_type.ty);
 
             LuauParam { name, typ }
+
         }
 
-        _ => unimplemented!(),
+        _ => panic!("unsupported FnArg type: {:?}", arg),
     }
 }
 
@@ -70,7 +71,7 @@ fn extract_pat_ident_name(pat: &Pat) -> String {
     match pat {
         Pat::Ident(ident) => ident.ident.to_string(),
 
-        _ => unimplemented!(),
+        _ => panic!("unsupported Pat type: {:?}", pat),
     }
 }
 
@@ -80,15 +81,25 @@ fn map_rust_type_to_luau(ty: &Type) -> String {
             let type_name = type_path.path.segments.last().unwrap().ident.to_string();
 
             match type_name.as_str() {
-                "i32" | "i64" | "u32" | "u64" | "f32" | "f64" => "number".to_string(),
+                "i8" | "u8" | "i16" | "u16" | "i32" | "i64" | "u32" | "u64" | "f32" | "f64" => "number".to_string(),
                 "bool" => "boolean".to_string(),
-                "String" | "&str" => "string".to_string(),
+                "String" => "string".to_string(),
 
                 _ => type_name,
             }
         }
 
-        _ => panic!(":( expected Type::Path but got {:?}", ty),
+        Type::Reference(type_ref) => {
+            let inner = map_rust_type_to_luau(&type_ref.elem);
+
+            if type_ref.mutability.is_some() {
+                format!("{}_mutref", inner)
+            } else {
+                format!("{}_ref", inner)
+            }
+        }
+
+        _ => panic!("unsupported rust type: {:?}", ty),
     }
 }
 
@@ -125,7 +136,7 @@ fn transform_stmt_to_luau(stmt: &Stmt) -> LuauNode {
         Stmt::Expr(expr, _semi) => transform_expr_to_luau(expr),
         Stmt::Item(item) => transform_item_to_luau(item),
 
-        _ => panic!("Unsupported statement type: {:?}", stmt),
+        _ => panic!("unsupported statement type: {:?}", stmt),
     }
 }
 
@@ -196,6 +207,29 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
             LuauNode::Value(path_str)
         }
 
-        _ => panic!("Unsupported expression type: {:?}", expr),
+        Expr::Reference(expr_ref) => {
+            let name = if let Expr::Path(expr_path) = &*expr_ref.expr {
+                expr_path.path.segments.last().unwrap().ident.to_string()
+            } else {
+                unimplemented!()
+            };
+
+            LuauNode::Ref {
+                name,
+                mutable: expr_ref.mutability.is_some()
+            }
+        }
+
+        Expr::Unary(expr_unary) => {
+            if let UnOp::Deref(_) = expr_unary.op {
+                LuauNode::Deref {
+                    expr: Box::new(transform_expr_to_luau(&expr_unary.expr)),
+                }
+            } else {
+                unimplemented!()
+            }
+        }
+
+        _ => panic!("unsupported expression type: {:?}", expr),
     }
 }
