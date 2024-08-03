@@ -15,6 +15,8 @@ In no particular order:
   - [x] implicit
 - [x] function params
   - [x] map most rust primitives to luau
+  - [ ] deref
+  - [ ] ref
   - [ ] generics
   - [ ] struct types?
 - [ ] structs
