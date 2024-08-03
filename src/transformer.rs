@@ -58,8 +58,13 @@ fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
         FnArg::Typed(pat_type) => {
             let name = extract_pat_ident_name(&pat_type.pat);
             let typ = map_rust_type_to_luau(&pat_type.ty);
+            let is_ref = match &*pat_type.ty {
+                Type::Reference(_) => true,
 
-            LuauParam { name, typ }
+                _ => false,
+            };
+
+            LuauParam { name, typ, is_ref }
 
         }
 
@@ -90,13 +95,7 @@ fn map_rust_type_to_luau(ty: &Type) -> String {
         }
 
         Type::Reference(type_ref) => {
-            let inner = map_rust_type_to_luau(&type_ref.elem);
-
-            if type_ref.mutability.is_some() {
-                format!("{}_mutref", inner)
-            } else {
-                format!("{}_ref", inner)
-            }
+            map_rust_type_to_luau(&type_ref.elem) // return the type name, but the resulting struct will have `is_ref: true``
         }
 
         _ => panic!("unsupported rust type: {:?}", ty),

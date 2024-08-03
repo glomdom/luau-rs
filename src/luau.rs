@@ -45,6 +45,7 @@ pub enum LuauNode {
 pub struct LuauParam {
     pub name: String,
     pub typ: String,
+    pub is_ref: bool,
 }
 
 #[derive(Debug)]
