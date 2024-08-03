@@ -1,7 +1,6 @@
 use quote::quote;
 use syn::File;
 
-mod generator;
 mod luau;
 mod parser;
 mod transformer;
@@ -11,11 +10,11 @@ fn main() {
         fn main(a: i32, b: String, c: f64) -> i32 {
             let x = 10;
 
-            sigma(&x);
+            sigma(&x)
         }
 
         fn sigma(a: &i32) -> i32 {
-            return *a * 2
+            *a * 2
         }
     };
 
