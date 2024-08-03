@@ -1,5 +1,5 @@
 use crate::luau::{LuauNode, LuauParam, LuauType};
-use syn::{Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type, UnOp};
+use syn::{BinOp, Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type, UnOp};
 
 pub fn transform_item_to_luau(item: &Item) -> LuauNode {
     match item {
@@ -169,24 +169,24 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
             let left = Box::new(transform_expr_to_luau(&expr_binary.left));
             let right = Box::new(transform_expr_to_luau(&expr_binary.right));
             let op = match &expr_binary.op {
-                syn::BinOp::Add(_) => "+".to_string(),
-                syn::BinOp::Sub(_) => "-".to_string(),
-                syn::BinOp::Mul(_) => "*".to_string(),
-                syn::BinOp::Div(_) => "/".to_string(),
-                syn::BinOp::Rem(_) => "%".to_string(),
-                syn::BinOp::And(_) => "&&".to_string(),
-                syn::BinOp::Or(_) => "||".to_string(),
-                syn::BinOp::BitXor(_) => "^".to_string(),
-                syn::BinOp::BitAnd(_) => "&".to_string(),
-                syn::BinOp::BitOr(_) => "|".to_string(),
-                syn::BinOp::Shl(_) => "<<".to_string(),
-                syn::BinOp::Shr(_) => ">>".to_string(),
-                syn::BinOp::Eq(_) => "==".to_string(),
-                syn::BinOp::Lt(_) => "<".to_string(),
-                syn::BinOp::Le(_) => "<=".to_string(),
-                syn::BinOp::Ne(_) => "!=".to_string(),
-                syn::BinOp::Ge(_) => ">=".to_string(),
-                syn::BinOp::Gt(_) => ">".to_string(),
+                BinOp::Add(_) => "+".to_string(),
+                BinOp::Sub(_) => "-".to_string(),
+                BinOp::Mul(_) => "*".to_string(),
+                BinOp::Div(_) => "/".to_string(),
+                BinOp::Rem(_) => "%".to_string(),
+                BinOp::And(_) => "&&".to_string(),
+                BinOp::Or(_) => "||".to_string(),
+                BinOp::BitXor(_) => "^".to_string(),
+                BinOp::BitAnd(_) => "&".to_string(),
+                BinOp::BitOr(_) => "|".to_string(),
+                BinOp::Shl(_) => "<<".to_string(),
+                BinOp::Shr(_) => ">>".to_string(),
+                BinOp::Eq(_) => "==".to_string(),
+                BinOp::Lt(_) => "<".to_string(),
+                BinOp::Le(_) => "<=".to_string(),
+                BinOp::Ne(_) => "!=".to_string(),
+                BinOp::Ge(_) => ">=".to_string(),
+                BinOp::Gt(_) => ">".to_string(),
 
                 _ => panic!("Unsupported binary operator"),
             };
