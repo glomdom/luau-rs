@@ -1,7 +1,5 @@
 use crate::luau::{LuauNode, LuauParam, LuauType};
-use syn::{
-    Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type, UnOp,
-};
+use syn::{Expr, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type, UnOp};
 
 pub fn transform_item_to_luau(item: &Item) -> LuauNode {
     match item {
@@ -27,7 +25,7 @@ pub fn transform_fn_to_luau(item_fn: &ItemFn) -> LuauNode {
             .map(transform_param_to_luau)
             .collect(),
         ret_type,
-        body: transform_block_to_luau(&item_fn.block.stmts)
+        body: transform_block_to_luau(&item_fn.block.stmts),
     }
 }
 
@@ -65,7 +63,6 @@ fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
             };
 
             LuauParam { name, typ, is_ref }
-
         }
 
         _ => panic!("unsupported FnArg type: {:?}", arg),
@@ -86,7 +83,10 @@ fn map_rust_type_to_luau(ty: &Type) -> String {
             let type_name = type_path.path.segments.last().unwrap().ident.to_string();
 
             match type_name.as_str() {
-                "i8" | "u8" | "i16" | "u16" | "i32" | "i64" | "u32" | "u64" | "f32" | "f64" => "number".to_string(),
+                "i8" | "u8" | "i16" | "u16" | "i32" | "i64" | "u32" | "u64" | "f32" | "f64" => {
+                    "number".to_string()
+                }
+
                 "bool" => "boolean".to_string(),
                 "String" => "string".to_string(),
 
@@ -215,7 +215,7 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
 
             LuauNode::Ref {
                 name,
-                mutable: expr_ref.mutability.is_some()
+                mutable: expr_ref.mutability.is_some(),
             }
         }
 
