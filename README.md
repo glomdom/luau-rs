@@ -13,10 +13,17 @@ In no particular order:
 - [x] returning
   - [x] explicit
   - [x] implicit
+- [ ] control flow
+  - [x] if
+  - [x] else
+  - [x] else if
+  - [ ] while
+  - [ ] for
+  - [ ] loop
 - [x] function params
   - [x] map most rust primitives to luau
-  - [ ] deref
-  - [ ] ref
+  - [x] deref
+  - [x] ref
   - [ ] generics
   - [ ] struct types?
 - [ ] structs
