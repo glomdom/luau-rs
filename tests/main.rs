@@ -19,7 +19,7 @@ fn main_tests(input: &str, output: &str) {
     let code = parse_rust_code(input);
     let ast = transformer::transform_file_to_luau(&code);
 
-    assert_eq!(format!("{:#?}", ast), output);
+    assert_eq!(output, format!("{:#?}", ast));
 }
 
 
