@@ -1,10 +1,10 @@
-# roblox-rs
+# luau-rs
 
-Rust to Luau compiler. Heavy inspiration from [roblox-ts](https://roblox-ts.com/)
+Rust to Luau AST. This is a made-up AST, which can be used for optimization, preprocessing or rendering to code.
 
-Current state is mapping rust AST to a custom IR which will ease Luau rendering.
+This project is in a very early stage, use in production is not recommended.
 
-:warning: **DISCLAIMER** -> This crate will be renamed in the near future.
+Main use is inside of [roblox-rs](https://github.com/glomdom/roblox-rs).
 
 ## roadmap
 
