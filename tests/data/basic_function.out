@@ -1,8 +1,19 @@
 Block {
     statements: [
         Function {
-            name: "main",
-            params: [],
+            name: "add",
+            params: [
+                LuauParam {
+                    name: "a",
+                    typ: "number",
+                    is_ref: false,
+                },
+                LuauParam {
+                    name: "b",
+                    typ: "number",
+                    is_ref: false,
+                },
+            ],
             ret_type: Some(
                 LuauType {
                     type_name: "number",
@@ -10,21 +21,19 @@ Block {
             ),
             body: Block {
                 statements: [
-                    Let {
-                        name: "x",
-                        expr: BinaryOp {
-                            op: "+",
-                            left: Value(
-                                "1",
-                            ),
-                            right: Value(
-                                "1",
-                            ),
-                        },
+                    Return {
+                        value: Some(
+                            BinaryOp {
+                                op: "+",
+                                left: Value(
+                                    "a",
+                                ),
+                                right: Value(
+                                    "b",
+                                ),
+                            },
+                        ),
                     },
-                    Value(
-                        "x",
-                    ),
                 ],
             },
         },
