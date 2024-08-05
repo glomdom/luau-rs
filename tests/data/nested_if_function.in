@@ -1,9 +1,21 @@
-fn main(a: i32) -> bool {
+fn main(a: i32, b: i32) -> bool {
     if a == 1 {
-        true
+        if b == 2 {
+            true
+        } else if b == 3 {
+            true
+        } else {
+            false
+        }
     } else if a == 2 {
-        false
-    } else {
         true
+    } else if b == 3 {
+        if a == 3 {
+            true
+        } else {
+            false
+        }
+    } else {
+        false
     }
 }

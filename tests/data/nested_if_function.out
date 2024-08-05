@@ -8,6 +8,11 @@ Block {
                     typ: "number",
                     is_ref: false,
                 },
+                LuauParam {
+                    name: "b",
+                    typ: "number",
+                    is_ref: false,
+                },
             ],
             ret_type: Some(
                 LuauType {
@@ -28,11 +33,63 @@ Block {
                         },
                         then_branch: Block {
                             statements: [
-                                Return {
-                                    value: Some(
-                                        Value(
-                                            "true",
+                                If {
+                                    condition: BinaryOp {
+                                        op: "==",
+                                        left: Value(
+                                            "b",
                                         ),
+                                        right: Value(
+                                            "2",
+                                        ),
+                                    },
+                                    then_branch: Block {
+                                        statements: [
+                                            Return {
+                                                value: Some(
+                                                    Value(
+                                                        "true",
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                    else_branch: Some(
+                                        If {
+                                            condition: BinaryOp {
+                                                op: "==",
+                                                left: Value(
+                                                    "b",
+                                                ),
+                                                right: Value(
+                                                    "3",
+                                                ),
+                                            },
+                                            then_branch: Block {
+                                                statements: [
+                                                    Return {
+                                                        value: Some(
+                                                            Value(
+                                                                "true",
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            else_branch: Some(
+                                                Block {
+                                                    statements: [
+                                                        Return {
+                                                            value: Some(
+                                                                Value(
+                                                                    "false",
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            ),
+                                        },
                                     ),
                                 },
                             ],
@@ -53,23 +110,75 @@ Block {
                                         Return {
                                             value: Some(
                                                 Value(
-                                                    "false",
+                                                    "true",
                                                 ),
                                             ),
                                         },
                                     ],
                                 },
                                 else_branch: Some(
-                                    Block {
-                                        statements: [
-                                            Return {
-                                                value: Some(
-                                                    Value(
-                                                        "true",
+                                    If {
+                                        condition: BinaryOp {
+                                            op: "==",
+                                            left: Value(
+                                                "b",
+                                            ),
+                                            right: Value(
+                                                "3",
+                                            ),
+                                        },
+                                        then_branch: Block {
+                                            statements: [
+                                                If {
+                                                    condition: BinaryOp {
+                                                        op: "==",
+                                                        left: Value(
+                                                            "a",
+                                                        ),
+                                                        right: Value(
+                                                            "3",
+                                                        ),
+                                                    },
+                                                    then_branch: Block {
+                                                        statements: [
+                                                            Return {
+                                                                value: Some(
+                                                                    Value(
+                                                                        "true",
+                                                                    ),
+                                                                ),
+                                                            },
+                                                        ],
+                                                    },
+                                                    else_branch: Some(
+                                                        Block {
+                                                            statements: [
+                                                                Return {
+                                                                    value: Some(
+                                                                        Value(
+                                                                            "false",
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                        },
                                                     ),
-                                                ),
+                                                },
+                                            ],
+                                        },
+                                        else_branch: Some(
+                                            Block {
+                                                statements: [
+                                                    Return {
+                                                        value: Some(
+                                                            Value(
+                                                                "false",
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
                                             },
-                                        ],
+                                        ),
                                     },
                                 ),
                             },

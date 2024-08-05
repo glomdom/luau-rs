@@ -1,0 +1,67 @@
+Block {
+    statements: [
+        Function {
+            name: "main",
+            params: [
+                LuauParam {
+                    name: "a",
+                    typ: "number",
+                    is_ref: false,
+                },
+            ],
+            ret_type: Some(
+                LuauType {
+                    type_name: "number",
+                },
+            ),
+            body: Block {
+                statements: [
+                    Return {
+                        value: Some(
+                            Call {
+                                func: "test_fn",
+                                args: [
+                                    Value(
+                                        "a",
+                                    ),
+                                ],
+                            },
+                        ),
+                    },
+                ],
+            },
+        },
+        Function {
+            name: "test_fn",
+            params: [
+                LuauParam {
+                    name: "a",
+                    typ: "number",
+                    is_ref: false,
+                },
+            ],
+            ret_type: Some(
+                LuauType {
+                    type_name: "number",
+                },
+            ),
+            body: Block {
+                statements: [
+                    Return {
+                        value: Some(
+                            BinaryOp {
+                                op: "+",
+                                left: Value(
+                                    "a",
+                                ),
+                                right: Value(
+                                    "2",
+                                ),
+                            },
+                        ),
+                    },
+                ],
+            },
+        },
+    ],
+}
