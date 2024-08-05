@@ -14,8 +14,6 @@ use pretty_assertions::assert_eq;
     output = r"${1}.out",
 })]
 fn main_tests(input: &str, output: &str) {
-    eprintln!("{}", input);
-
     let code = parse_rust_code(input);
     let ast = transformer::transform_file_to_luau(&code);
 
