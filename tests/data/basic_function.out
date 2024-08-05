@@ -1,0 +1,32 @@
+Block {
+    statements: [
+        Function {
+            name: "main",
+            params: [],
+            ret_type: Some(
+                LuauType {
+                    type_name: "number",
+                },
+            ),
+            body: Block {
+                statements: [
+                    Let {
+                        name: "x",
+                        expr: BinaryOp {
+                            op: "+",
+                            left: Value(
+                                "1",
+                            ),
+                            right: Value(
+                                "1",
+                            ),
+                        },
+                    },
+                    Value(
+                        "x",
+                    ),
+                ],
+            },
+        },
+    ],
+}
