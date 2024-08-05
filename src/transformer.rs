@@ -45,17 +45,19 @@ fn transform_block_to_luau(block: &Block) -> LuauNode {
     let stmts = &block.stmts;
     let mut luau_nodes = vec![];
 
-    for (i, stmt) in stmts.iter().enumerate() {
-        let is_last = i == stmts.len() - 1;
-
-        if let Stmt::Expr(expr, None) = stmt {
-            if is_last {
-                luau_nodes.push(transform_expr_to_luau(expr));
-            } else {
-                luau_nodes.push(transform_expr_to_luau(expr));
+    for stmt in stmts {
+        match stmt {
+            Stmt::Expr(expr, semi) => {
+                if let Some(_) = semi {
+                    luau_nodes.push(transform_expr_to_luau(expr));
+                } else {
+                    luau_nodes.push(LuauNode::Return {
+                        value: Some(Box::new(transform_expr_to_luau(expr))),
+                    });
+                }
             }
-        } else {
-            luau_nodes.push(transform_stmt_to_luau(&stmt));
+
+            _ => luau_nodes.push(transform_stmt_to_luau(stmt)),
         }
     }
 
