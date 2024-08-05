@@ -1,0 +1,7 @@
+fn main(a: i32) -> i32 {
+    test_fn(a)
+}
+
+fn test_fn(a: i32) -> i32 {
+    a + 2
+}

@@ -1,0 +1,45 @@
+Block {
+    statements: [
+        Function {
+            name: "main",
+            params: [],
+            ret_type: Some(
+                LuauType {
+                    type_name: "number",
+                },
+            ),
+            body: Block {
+                statements: [
+                    Return {
+                        value: Some(
+                            Call {
+                                func: "test_fn",
+                                args: [],
+                            },
+                        ),
+                    },
+                ],
+            },
+        },
+        Function {
+            name: "test_fn",
+            params: [],
+            ret_type: Some(
+                LuauType {
+                    type_name: "number",
+                },
+            ),
+            body: Block {
+                statements: [
+                    Return {
+                        value: Some(
+                            Value(
+                                "2",
+                            ),
+                        ),
+                    },
+                ],
+            },
+        },
+    ],
+}

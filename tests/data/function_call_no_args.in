@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    test_fn()
+}
+
+fn test_fn() -> i32 {
+    2
+}
