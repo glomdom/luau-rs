@@ -21,7 +21,7 @@ pub fn transform_item_to_luau(item: &Item) -> LuauNode {
     }
 }
 
-pub fn transform_fn_to_luau(item_fn: &ItemFn) -> LuauNode {
+fn transform_fn_to_luau(item_fn: &ItemFn) -> LuauNode {
     let name = item_fn.sig.ident.to_string();
     let ret_type = match &item_fn.sig.output {
         ReturnType::Default => None,
