@@ -1,0 +1,9 @@
+fn main(a: i32) -> bool {
+    if a == 1 {
+        true
+    } else if a == 2 {
+        false
+    } else {
+        true
+    }
+}

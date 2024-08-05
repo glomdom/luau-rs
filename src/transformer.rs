@@ -50,10 +50,12 @@ fn transform_block_to_luau(block: &Block) -> LuauNode {
             Stmt::Expr(expr, semi) => {
                 if let Some(_) = semi {
                     luau_nodes.push(transform_expr_to_luau(expr));
-                } else {
+                } else if should_be_returned(expr) {
                     luau_nodes.push(LuauNode::Return {
                         value: Some(Box::new(transform_expr_to_luau(expr))),
                     });
+                } else {
+                    luau_nodes.push(transform_expr_to_luau(expr));
                 }
             }
 
@@ -178,12 +180,12 @@ fn transform_if_expr(expr_if: &ExprIf) -> LuauNode {
 
 fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
     match expr {
-        Expr::Lit(expr_lit) => {
-            if let Lit::Int(lit_int) = &expr_lit.lit {
-                LuauNode::Value(lit_int.base10_digits().to_string())
-            } else {
-                unimplemented!()
-            }
+        Expr::Lit(expr_lit) => match &expr_lit.lit {
+            Lit::Int(lit_int) => LuauNode::Value(lit_int.base10_digits().to_string()),
+            Lit::Bool(lit_bool) => LuauNode::Value(lit_bool.value.to_string()),
+            Lit::Str(lit_str) => LuauNode::Value(lit_str.value()),
+
+            _ => unimplemented!(),
         }
 
         Expr::Call(expr_call) => {
@@ -270,5 +272,13 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
         Expr::If(expr_if) => transform_if_expr(expr_if),
 
         _ => panic!("unsupported expression type: {:?}", expr),
+    }
+}
+
+fn should_be_returned(expr: &Expr) -> bool {
+    match expr {
+        Expr::If(_) | Expr::Loop(_) | Expr::ForLoop(_) | Expr::While(_) => false,
+
+        _ => true,
     }
 }
