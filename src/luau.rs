@@ -11,7 +11,7 @@ pub enum LuauNode {
 
     If {
         condition: Box<LuauNode>,
-        then_branch: Vec<LuauNode>,
+        then_branch: Box<LuauNode>,
         else_branch: Option<Box<LuauNode>>,
     },
 

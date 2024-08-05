@@ -50,7 +50,9 @@ fn transform_block_to_luau(block: &Block) -> LuauNode {
         }
     }
 
-    LuauNode::Block { statements: luau_nodes }
+    LuauNode::Block {
+        statements: luau_nodes,
+    }
 }
 
 fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
@@ -143,11 +145,7 @@ fn transform_stmt_to_luau(stmt: &Stmt) -> LuauNode {
 
 fn transform_if_expr(expr_if: &ExprIf) -> LuauNode {
     let condition = transform_expr_to_luau(&expr_if.cond);
-    let then_branch = match transform_block_to_luau(&expr_if.then_branch) {
-        LuauNode::Block { statements } => statements,
-
-        _ => panic!("expected a block"),
-    };
+    let then_branch = transform_block_to_luau(&expr_if.then_branch);
 
     let else_branch = if let Some((_, else_expr)) = &expr_if.else_branch {
         match else_expr.as_ref() {
@@ -160,7 +158,11 @@ fn transform_if_expr(expr_if: &ExprIf) -> LuauNode {
         None
     };
 
-    LuauNode::If { condition: Box::new(condition), then_branch, else_branch }
+    LuauNode::If {
+        condition: Box::new(condition),
+        then_branch: Box::new(then_branch),
+        else_branch,
+    }
 }
 
 fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
