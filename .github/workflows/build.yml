@@ -21,6 +21,11 @@ jobs:
         profile: minimal
         toolchain: nightly
     - name: Build luau-rs
-      run: cargo build --verbose
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
     - name: Run tests in luau-rs
-      run: cargo test --verbose
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --verbose
