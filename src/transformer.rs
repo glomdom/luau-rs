@@ -1,8 +1,17 @@
 use crate::luau::{LuauNode, LuauParam, LuauType};
 use syn::{
-    BinOp, Block, Expr, ExprIf, ExprReturn, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type,
-    UnOp,
+    BinOp, Block, Expr, ExprIf, ExprReturn, File, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type, UnOp
 };
+
+pub fn transform_file_to_luau(file: &File) -> LuauNode {
+    let mut nodes = vec![];
+
+    for item in &file.items {
+        nodes.push(transform_item_to_luau(item));
+    }
+
+    LuauNode::Block { statements: nodes }
+}
 
 pub fn transform_item_to_luau(item: &Item) -> LuauNode {
     match item {
