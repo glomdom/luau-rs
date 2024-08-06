@@ -2,6 +2,36 @@
 
 #[derive(Debug)]
 pub enum LuauNode {
+    BinaryOp {
+        op: String,
+        left: Box<LuauNode>,
+        right: Box<LuauNode>,
+    },
+
+    Block {
+        statements: Vec<LuauNode>,
+    },
+
+    Call {
+        func: String,
+        args: Vec<LuauNode>,
+    },
+
+    Deref {
+        expr: Box<LuauNode>,
+    },
+
+    Range {
+        start: Option<Box<LuauNode>>,
+        end: Option<Box<LuauNode>>,
+    },
+
+    ForIn {
+        vars: Vec<String>,
+        iter: Box<LuauNode>,
+        body: Box<LuauNode>,
+    },
+
     Function {
         name: String,
         params: Vec<LuauParam>,
@@ -15,28 +45,9 @@ pub enum LuauNode {
         else_branch: Option<Box<LuauNode>>,
     },
 
-    Return {
-        value: Option<Box<LuauNode>>,
-    },
-
     Let {
         name: String,
         expr: Box<LuauNode>,
-    },
-
-    Call {
-        func: String,
-        args: Vec<LuauNode>,
-    },
-
-    BinaryOp {
-        op: String,
-        left: Box<LuauNode>,
-        right: Box<LuauNode>,
-    },
-
-    Block {
-        statements: Vec<LuauNode>,
     },
 
     Ref {
@@ -44,8 +55,13 @@ pub enum LuauNode {
         mutable: bool,
     },
 
-    Deref {
-        expr: Box<LuauNode>,
+    Return {
+        value: Option<Box<LuauNode>>,
+    },
+
+    While {
+        condition: Box<LuauNode>,
+        body: Box<LuauNode>,
     },
 
     Value(String),
