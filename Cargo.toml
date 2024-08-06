@@ -1,5 +1,11 @@
 [package]
 name = "roblox-rs"
+description = "Rust to a made-up Luau AST."
+license = "EUPL-1.2"
+license-file = "LICENSE"
+homepage = "https://github.com/glomdom/luau-rs"
+repository = "https://github.com/glomdom/luau-rs"
+readme = "README.md"
 version = "0.1.0"
 edition = "2021"
 
