@@ -100,8 +100,7 @@ pub enum LuauNode {
 #[derive(Debug)]
 pub struct LuauParam {
     pub name: String,
-    pub typ: String,
-    pub is_ref: bool,
+    pub typ: LuauType,
 }
 
 #[derive(Debug)]
@@ -113,4 +112,6 @@ pub struct LuauField {
 #[derive(Debug)]
 pub struct LuauType {
     pub type_name: String,
+    pub is_mut: bool,
+    pub is_ref: bool,
 }

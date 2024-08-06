@@ -26,7 +26,7 @@ fn transform_fn_to_luau(item_fn: &ItemFn) -> LuauNode {
     let name = item_fn.sig.ident.to_string();
     let ret_type = match &item_fn.sig.output {
         ReturnType::Default => None,
-        ReturnType::Type(_, ty) => Some(transform_return_type_to_luau(ty)),
+        ReturnType::Type(_, ty) => Some(transform_type_to_luau(ty)),
     };
 
     LuauNode::Function(Function {
@@ -73,10 +73,8 @@ fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
     match arg {
         FnArg::Typed(pat_type) => {
             let name = extract_pat_ident_name(&pat_type.pat);
-            let typ = map_rust_type_to_luau(&pat_type.ty);
-            let is_ref = matches!(&*pat_type.ty, Type::Reference(_));
-
-            LuauParam { name, typ, is_ref }
+            let typ = transform_type_to_luau(&pat_type.ty);
+            LuauParam { name, typ }
         }
 
         _ => panic!("unsupported FnArg type: {:?}", arg),
@@ -114,9 +112,14 @@ fn map_rust_type_to_luau(ty: &Type) -> String {
     }
 }
 
-fn transform_return_type_to_luau(ty: &Type) -> LuauType {
+fn transform_type_to_luau(ty: &Type) -> LuauType {
+    let is_ref = matches!(ty, Type::Reference(_));
+    let type_name = map_rust_type_to_luau(ty);
+
     LuauType {
-        type_name: map_rust_type_to_luau(ty),
+        type_name,
+        is_ref,
+        is_mut: false,
     }
 }
 

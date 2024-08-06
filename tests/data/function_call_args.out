@@ -7,13 +7,18 @@ Block(
                     params: [
                         LuauParam {
                             name: "a",
-                            typ: "number",
-                            is_ref: false,
+                            typ: LuauType {
+                                type_name: "number",
+                                is_mut: false,
+                                is_ref: false,
+                            },
                         },
                     ],
                     ret_type: Some(
                         LuauType {
                             type_name: "number",
+                            is_mut: false,
+                            is_ref: false,
                         },
                     ),
                     body: Block(
@@ -48,13 +53,18 @@ Block(
                     params: [
                         LuauParam {
                             name: "a",
-                            typ: "number",
-                            is_ref: false,
+                            typ: LuauType {
+                                type_name: "number",
+                                is_mut: false,
+                                is_ref: false,
+                            },
                         },
                     ],
                     ret_type: Some(
                         LuauType {
                             type_name: "number",
+                            is_mut: false,
+                            is_ref: false,
                         },
                     ),
                     body: Block(
