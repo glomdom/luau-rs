@@ -1,41 +1,55 @@
-Block {
-    statements: [
-        Function {
-            name: "add",
-            params: [
-                LuauParam {
-                    name: "a",
-                    typ: "number",
-                    is_ref: false,
-                },
-                LuauParam {
-                    name: "b",
-                    typ: "number",
-                    is_ref: false,
-                },
-            ],
-            ret_type: Some(
-                LuauType {
-                    type_name: "number",
+Block(
+    Block {
+        statements: [
+            Function(
+                Function {
+                    name: "add",
+                    params: [
+                        LuauParam {
+                            name: "a",
+                            typ: "number",
+                            is_ref: false,
+                        },
+                        LuauParam {
+                            name: "b",
+                            typ: "number",
+                            is_ref: false,
+                        },
+                    ],
+                    ret_type: Some(
+                        LuauType {
+                            type_name: "number",
+                        },
+                    ),
+                    body: Block(
+                        Block {
+                            statements: [
+                                Return(
+                                    Return {
+                                        value: Some(
+                                            BinaryOp(
+                                                BinaryOp {
+                                                    op: "+",
+                                                    left: Value(
+                                                        Value {
+                                                            value: "a",
+                                                        },
+                                                    ),
+                                                    right: Value(
+                                                        Value {
+                                                            value: "b",
+                                                        },
+                                                    ),
+                                                },
+                                            ),
+                                        ),
+                                    },
+                                ),
+                            ],
+                        },
+                    ),
                 },
             ),
-            body: Block {
-                statements: [
-                    Return {
-                        value: Some(
-                            BinaryOp {
-                                op: "+",
-                                left: Value(
-                                    "a",
-                                ),
-                                right: Value(
-                                    "b",
-                                ),
-                            },
-                        ),
-                    },
-                ],
-            },
-        },
-    ],
-}
+        ],
+    },
+)

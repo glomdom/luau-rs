@@ -1,0 +1,49 @@
+Block(
+    Block {
+        statements: [
+            Function(
+                Function {
+                    name: "main",
+                    params: [],
+                    ret_type: None,
+                    body: Block(
+                        Block {
+                            statements: [
+                                ForIn(
+                                    ForIn {
+                                        vars: [
+                                            "x",
+                                        ],
+                                        iter: Range(
+                                            Range {
+                                                start: Some(
+                                                    Value(
+                                                        Value {
+                                                            value: "1",
+                                                        },
+                                                    ),
+                                                ),
+                                                end: Some(
+                                                    Value(
+                                                        Value {
+                                                            value: "10",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        body: Block(
+                                            Block {
+                                                statements: [],
+                                            },
+                                        ),
+                                    },
+                                ),
+                            ],
+                        },
+                    ),
+                },
+            ),
+        ],
+    },
+)

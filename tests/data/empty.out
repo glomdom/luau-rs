@@ -1,3 +1,5 @@
-Block {
-    statements: [],
-}
+Block(
+    Block {
+        statements: [],
+    },
+)
