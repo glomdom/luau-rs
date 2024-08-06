@@ -1,6 +1,6 @@
-use crate::luau::{LuauNode, LuauParam, LuauType};
+use crate::luau::{BinaryOp, Block, Call, Deref, ForIn, Function, If, Let, LuauNode, LuauParam, LuauType, Range, Ref, Return, Value};
 use syn::{
-    BinOp, Block, Expr, ExprForLoop, ExprIf, ExprReturn, File, FnArg, Item, ItemFn, Lit, Pat,
+    BinOp, Expr, ExprForLoop, ExprIf, ExprReturn, File, FnArg, Item, ItemFn, Lit, Pat,
     ReturnType, Stmt, Type, UnOp,
 };
 
@@ -11,7 +11,7 @@ pub fn transform_file_to_luau(file: &File) -> LuauNode {
         nodes.push(transform_item_to_luau(item));
     }
 
-    LuauNode::Block { statements: nodes }
+    LuauNode::Block(Block { statements: nodes })
 }
 
 pub fn transform_item_to_luau(item: &Item) -> LuauNode {
@@ -29,7 +29,7 @@ fn transform_fn_to_luau(item_fn: &ItemFn) -> LuauNode {
         ReturnType::Type(_, ty) => Some(transform_return_type_to_luau(ty)),
     };
 
-    LuauNode::Function {
+    LuauNode::Function(Function {
         name,
         params: item_fn
             .sig
@@ -39,10 +39,10 @@ fn transform_fn_to_luau(item_fn: &ItemFn) -> LuauNode {
             .collect(),
         ret_type,
         body: Box::new(transform_block_to_luau(&item_fn.block)),
-    }
+    })
 }
 
-fn transform_block_to_luau(block: &Block) -> LuauNode {
+fn transform_block_to_luau(block: &syn::Block) -> LuauNode {
     let stmts = &block.stmts;
     let mut luau_nodes = vec![];
 
@@ -52,9 +52,9 @@ fn transform_block_to_luau(block: &Block) -> LuauNode {
                 if let Some(_) = semi {
                     luau_nodes.push(transform_expr_to_luau(expr));
                 } else if should_be_returned(expr) {
-                    luau_nodes.push(LuauNode::Return {
+                    luau_nodes.push(LuauNode::Return(Return {
                         value: Some(Box::new(transform_expr_to_luau(expr))),
-                    });
+                    }));
                 } else {
                     luau_nodes.push(transform_expr_to_luau(expr));
                 }
@@ -64,9 +64,9 @@ fn transform_block_to_luau(block: &Block) -> LuauNode {
         }
     }
 
-    LuauNode::Block {
+    LuauNode::Block(Block {
         statements: luau_nodes,
-    }
+    })
 }
 
 fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
@@ -74,11 +74,7 @@ fn transform_param_to_luau(arg: &FnArg) -> LuauParam {
         FnArg::Typed(pat_type) => {
             let name = extract_pat_ident_name(&pat_type.pat);
             let typ = map_rust_type_to_luau(&pat_type.ty);
-            let is_ref = match &*pat_type.ty {
-                Type::Reference(_) => true,
-
-                _ => false,
-            };
+            let is_ref = matches!(&*pat_type.ty, Type::Reference(_));
 
             LuauParam { name, typ, is_ref }
         }
@@ -112,9 +108,7 @@ fn map_rust_type_to_luau(ty: &Type) -> String {
             }
         }
 
-        Type::Reference(type_ref) => {
-            map_rust_type_to_luau(&type_ref.elem) // return the type name, but the resulting struct will have `is_ref: true``
-        }
+        Type::Reference(type_ref) => map_rust_type_to_luau(&type_ref.elem),
 
         _ => panic!("unsupported rust type: {:?}", ty),
     }
@@ -132,7 +126,7 @@ fn transform_return_to_luau(ret_expr: &ExprReturn) -> LuauNode {
         .as_ref()
         .map(|expr| Box::new(transform_expr_to_luau(expr)));
 
-    LuauNode::Return { value }
+    LuauNode::Return(Return { value })
 }
 
 fn transform_stmt_to_luau(stmt: &Stmt) -> LuauNode {
@@ -140,14 +134,14 @@ fn transform_stmt_to_luau(stmt: &Stmt) -> LuauNode {
         Stmt::Local(local) => {
             let name = extract_pat_ident_name(&local.pat);
             let expr = local.init.as_ref().map_or_else(
-                || LuauNode::Value("".to_string()),
+                || LuauNode::Value(Value { value: "".to_string() }),
                 |init| transform_expr_to_luau(&init.expr),
             );
 
-            LuauNode::Let {
+            LuauNode::Let(Let {
                 name,
                 expr: Box::new(expr),
-            }
+            })
         }
 
         Stmt::Expr(expr, _semi) => transform_expr_to_luau(expr),
@@ -172,11 +166,11 @@ fn transform_if_expr(expr_if: &ExprIf) -> LuauNode {
         None
     };
 
-    LuauNode::If {
+    LuauNode::If(If {
         condition: Box::new(condition),
         then_branch: Box::new(then_branch),
         else_branch,
-    }
+    })
 }
 
 fn transform_for_loop(expr_for: &ExprForLoop) -> LuauNode {
@@ -184,15 +178,15 @@ fn transform_for_loop(expr_for: &ExprForLoop) -> LuauNode {
     let iter = Box::new(transform_expr_to_luau(&expr_for.expr));
     let body = Box::new(transform_block_to_luau(&expr_for.body));
 
-    LuauNode::ForIn { vars, iter, body }
+    LuauNode::ForIn(ForIn { vars, iter, body })
 }
 
 fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
     match expr {
         Expr::Lit(expr_lit) => match &expr_lit.lit {
-            Lit::Int(lit_int) => LuauNode::Value(lit_int.base10_digits().to_string()),
-            Lit::Bool(lit_bool) => LuauNode::Value(lit_bool.value.to_string()),
-            Lit::Str(lit_str) => LuauNode::Value(lit_str.value()),
+            Lit::Int(lit_int) => LuauNode::Value(Value { value: lit_int.base10_digits().to_string() }),
+            Lit::Bool(lit_bool) => LuauNode::Value(Value { value: lit_bool.value.to_string() }),
+            Lit::Str(lit_str) => LuauNode::Value(Value { value: lit_str.value() }),
 
             _ => unimplemented!(),
         },
@@ -206,10 +200,10 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
 
             let args = expr_call.args.iter().map(transform_expr_to_luau).collect();
 
-            LuauNode::Call {
+            LuauNode::Call(Call {
                 func: func_name,
                 args,
-            }
+            })
         }
 
         Expr::Return(ret_expr) => transform_return_to_luau(ret_expr),
@@ -239,7 +233,7 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
                 _ => panic!("Unsupported binary operator"),
             };
 
-            LuauNode::BinaryOp { op, left, right }
+            LuauNode::BinaryOp(BinaryOp { op, left, right })
         }
 
         Expr::Path(expr_path) => {
@@ -251,7 +245,7 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
                 .collect::<Vec<_>>()
                 .join("::");
 
-            LuauNode::Value(path_str)
+            LuauNode::Value(Value { value: path_str })
         }
 
         Expr::Reference(expr_ref) => {
@@ -261,17 +255,17 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
                 unimplemented!()
             };
 
-            LuauNode::Ref {
+            LuauNode::Ref(Ref {
                 name,
                 mutable: expr_ref.mutability.is_some(),
-            }
+            })
         }
 
         Expr::Unary(expr_unary) => {
             if let UnOp::Deref(_) = expr_unary.op {
-                LuauNode::Deref {
+                LuauNode::Deref(Deref {
                     expr: Box::new(transform_expr_to_luau(&expr_unary.expr)),
-                }
+                })
             } else {
                 unimplemented!()
             }
@@ -290,7 +284,7 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
                 .as_ref()
                 .map(|e| Box::new(transform_expr_to_luau(e)));
 
-            LuauNode::Range { start, end }
+            LuauNode::Range(Range { start, end })
         }
 
         _ => panic!("unsupported expression type: {:?}", expr),

@@ -1,45 +1,63 @@
-Block {
-    statements: [
-        Function {
-            name: "main",
-            params: [],
-            ret_type: Some(
-                LuauType {
-                    type_name: "number",
+Block(
+    Block {
+        statements: [
+            Function(
+                Function {
+                    name: "main",
+                    params: [],
+                    ret_type: Some(
+                        LuauType {
+                            type_name: "number",
+                        },
+                    ),
+                    body: Block(
+                        Block {
+                            statements: [
+                                Return(
+                                    Return {
+                                        value: Some(
+                                            Call(
+                                                Call {
+                                                    func: "test_fn",
+                                                    args: [],
+                                                },
+                                            ),
+                                        ),
+                                    },
+                                ),
+                            ],
+                        },
+                    ),
                 },
             ),
-            body: Block {
-                statements: [
-                    Return {
-                        value: Some(
-                            Call {
-                                func: "test_fn",
-                                args: [],
-                            },
-                        ),
-                    },
-                ],
-            },
-        },
-        Function {
-            name: "test_fn",
-            params: [],
-            ret_type: Some(
-                LuauType {
-                    type_name: "number",
+            Function(
+                Function {
+                    name: "test_fn",
+                    params: [],
+                    ret_type: Some(
+                        LuauType {
+                            type_name: "number",
+                        },
+                    ),
+                    body: Block(
+                        Block {
+                            statements: [
+                                Return(
+                                    Return {
+                                        value: Some(
+                                            Value(
+                                                Value {
+                                                    value: "2",
+                                                },
+                                            ),
+                                        ),
+                                    },
+                                ),
+                            ],
+                        },
+                    ),
                 },
             ),
-            body: Block {
-                statements: [
-                    Return {
-                        value: Some(
-                            Value(
-                                "2",
-                            ),
-                        ),
-                    },
-                ],
-            },
-        },
-    ],
-}
+        ],
+    },
+)

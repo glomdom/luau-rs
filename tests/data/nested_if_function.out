@@ -1,191 +1,291 @@
-Block {
-    statements: [
-        Function {
-            name: "main",
-            params: [
-                LuauParam {
-                    name: "a",
-                    typ: "number",
-                    is_ref: false,
-                },
-                LuauParam {
-                    name: "b",
-                    typ: "number",
-                    is_ref: false,
-                },
-            ],
-            ret_type: Some(
-                LuauType {
-                    type_name: "boolean",
-                },
-            ),
-            body: Block {
-                statements: [
-                    If {
-                        condition: BinaryOp {
-                            op: "==",
-                            left: Value(
-                                "a",
-                            ),
-                            right: Value(
-                                "1",
-                            ),
+Block(
+    Block {
+        statements: [
+            Function(
+                Function {
+                    name: "main",
+                    params: [
+                        LuauParam {
+                            name: "a",
+                            typ: "number",
+                            is_ref: false,
                         },
-                        then_branch: Block {
+                        LuauParam {
+                            name: "b",
+                            typ: "number",
+                            is_ref: false,
+                        },
+                    ],
+                    ret_type: Some(
+                        LuauType {
+                            type_name: "boolean",
+                        },
+                    ),
+                    body: Block(
+                        Block {
                             statements: [
-                                If {
-                                    condition: BinaryOp {
-                                        op: "==",
-                                        left: Value(
-                                            "b",
-                                        ),
-                                        right: Value(
-                                            "2",
-                                        ),
-                                    },
-                                    then_branch: Block {
-                                        statements: [
-                                            Return {
-                                                value: Some(
-                                                    Value(
-                                                        "true",
-                                                    ),
-                                                ),
-                                            },
-                                        ],
-                                    },
-                                    else_branch: Some(
-                                        If {
-                                            condition: BinaryOp {
+                                If(
+                                    If {
+                                        condition: BinaryOp(
+                                            BinaryOp {
                                                 op: "==",
                                                 left: Value(
-                                                    "b",
+                                                    Value {
+                                                        value: "a",
+                                                    },
                                                 ),
                                                 right: Value(
-                                                    "3",
+                                                    Value {
+                                                        value: "1",
+                                                    },
                                                 ),
                                             },
-                                            then_branch: Block {
+                                        ),
+                                        then_branch: Block(
+                                            Block {
                                                 statements: [
-                                                    Return {
-                                                        value: Some(
-                                                            Value(
-                                                                "true",
+                                                    If(
+                                                        If {
+                                                            condition: BinaryOp(
+                                                                BinaryOp {
+                                                                    op: "==",
+                                                                    left: Value(
+                                                                        Value {
+                                                                            value: "b",
+                                                                        },
+                                                                    ),
+                                                                    right: Value(
+                                                                        Value {
+                                                                            value: "2",
+                                                                        },
+                                                                    ),
+                                                                },
                                                             ),
-                                                        ),
-                                                    },
-                                                ],
-                                            },
-                                            else_branch: Some(
-                                                Block {
-                                                    statements: [
-                                                        Return {
-                                                            value: Some(
-                                                                Value(
-                                                                    "false",
+                                                            then_branch: Block(
+                                                                Block {
+                                                                    statements: [
+                                                                        Return(
+                                                                            Return {
+                                                                                value: Some(
+                                                                                    Value(
+                                                                                        Value {
+                                                                                            value: "true",
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ],
+                                                                },
+                                                            ),
+                                                            else_branch: Some(
+                                                                If(
+                                                                    If {
+                                                                        condition: BinaryOp(
+                                                                            BinaryOp {
+                                                                                op: "==",
+                                                                                left: Value(
+                                                                                    Value {
+                                                                                        value: "b",
+                                                                                    },
+                                                                                ),
+                                                                                right: Value(
+                                                                                    Value {
+                                                                                        value: "3",
+                                                                                    },
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                        then_branch: Block(
+                                                                            Block {
+                                                                                statements: [
+                                                                                    Return(
+                                                                                        Return {
+                                                                                            value: Some(
+                                                                                                Value(
+                                                                                                    Value {
+                                                                                                        value: "true",
+                                                                                                    },
+                                                                                                ),
+                                                                                            ),
+                                                                                        },
+                                                                                    ),
+                                                                                ],
+                                                                            },
+                                                                        ),
+                                                                        else_branch: Some(
+                                                                            Block(
+                                                                                Block {
+                                                                                    statements: [
+                                                                                        Return(
+                                                                                            Return {
+                                                                                                value: Some(
+                                                                                                    Value(
+                                                                                                        Value {
+                                                                                                            value: "false",
+                                                                                                        },
+                                                                                                    ),
+                                                                                                ),
+                                                                                            },
+                                                                                        ),
+                                                                                    ],
+                                                                                },
+                                                                            ),
+                                                                        ),
+                                                                    },
                                                                 ),
                                                             ),
                                                         },
-                                                    ],
-                                                },
-                                            ),
-                                        },
-                                    ),
-                                },
-                            ],
-                        },
-                        else_branch: Some(
-                            If {
-                                condition: BinaryOp {
-                                    op: "==",
-                                    left: Value(
-                                        "a",
-                                    ),
-                                    right: Value(
-                                        "2",
-                                    ),
-                                },
-                                then_branch: Block {
-                                    statements: [
-                                        Return {
-                                            value: Some(
-                                                Value(
-                                                    "true",
-                                                ),
-                                            ),
-                                        },
-                                    ],
-                                },
-                                else_branch: Some(
-                                    If {
-                                        condition: BinaryOp {
-                                            op: "==",
-                                            left: Value(
-                                                "b",
-                                            ),
-                                            right: Value(
-                                                "3",
-                                            ),
-                                        },
-                                        then_branch: Block {
-                                            statements: [
+                                                    ),
+                                                ],
+                                            },
+                                        ),
+                                        else_branch: Some(
+                                            If(
                                                 If {
-                                                    condition: BinaryOp {
-                                                        op: "==",
-                                                        left: Value(
-                                                            "a",
-                                                        ),
-                                                        right: Value(
-                                                            "3",
-                                                        ),
-                                                    },
-                                                    then_branch: Block {
-                                                        statements: [
-                                                            Return {
-                                                                value: Some(
-                                                                    Value(
-                                                                        "true",
-                                                                    ),
-                                                                ),
-                                                            },
-                                                        ],
-                                                    },
-                                                    else_branch: Some(
+                                                    condition: BinaryOp(
+                                                        BinaryOp {
+                                                            op: "==",
+                                                            left: Value(
+                                                                Value {
+                                                                    value: "a",
+                                                                },
+                                                            ),
+                                                            right: Value(
+                                                                Value {
+                                                                    value: "2",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ),
+                                                    then_branch: Block(
                                                         Block {
                                                             statements: [
-                                                                Return {
-                                                                    value: Some(
-                                                                        Value(
-                                                                            "false",
+                                                                Return(
+                                                                    Return {
+                                                                        value: Some(
+                                                                            Value(
+                                                                                Value {
+                                                                                    value: "true",
+                                                                                },
+                                                                            ),
                                                                         ),
-                                                                    ),
-                                                                },
+                                                                    },
+                                                                ),
                                                             ],
                                                         },
                                                     ),
-                                                },
-                                            ],
-                                        },
-                                        else_branch: Some(
-                                            Block {
-                                                statements: [
-                                                    Return {
-                                                        value: Some(
-                                                            Value(
-                                                                "false",
-                                                            ),
+                                                    else_branch: Some(
+                                                        If(
+                                                            If {
+                                                                condition: BinaryOp(
+                                                                    BinaryOp {
+                                                                        op: "==",
+                                                                        left: Value(
+                                                                            Value {
+                                                                                value: "b",
+                                                                            },
+                                                                        ),
+                                                                        right: Value(
+                                                                            Value {
+                                                                                value: "3",
+                                                                            },
+                                                                        ),
+                                                                    },
+                                                                ),
+                                                                then_branch: Block(
+                                                                    Block {
+                                                                        statements: [
+                                                                            If(
+                                                                                If {
+                                                                                    condition: BinaryOp(
+                                                                                        BinaryOp {
+                                                                                            op: "==",
+                                                                                            left: Value(
+                                                                                                Value {
+                                                                                                    value: "a",
+                                                                                                },
+                                                                                            ),
+                                                                                            right: Value(
+                                                                                                Value {
+                                                                                                    value: "3",
+                                                                                                },
+                                                                                            ),
+                                                                                        },
+                                                                                    ),
+                                                                                    then_branch: Block(
+                                                                                        Block {
+                                                                                            statements: [
+                                                                                                Return(
+                                                                                                    Return {
+                                                                                                        value: Some(
+                                                                                                            Value(
+                                                                                                                Value {
+                                                                                                                    value: "true",
+                                                                                                                },
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    },
+                                                                                                ),
+                                                                                            ],
+                                                                                        },
+                                                                                    ),
+                                                                                    else_branch: Some(
+                                                                                        Block(
+                                                                                            Block {
+                                                                                                statements: [
+                                                                                                    Return(
+                                                                                                        Return {
+                                                                                                            value: Some(
+                                                                                                                Value(
+                                                                                                                    Value {
+                                                                                                                        value: "false",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ),
+                                                                                                ],
+                                                                                            },
+                                                                                        ),
+                                                                                    ),
+                                                                                },
+                                                                            ),
+                                                                        ],
+                                                                    },
+                                                                ),
+                                                                else_branch: Some(
+                                                                    Block(
+                                                                        Block {
+                                                                            statements: [
+                                                                                Return(
+                                                                                    Return {
+                                                                                        value: Some(
+                                                                                            Value(
+                                                                                                Value {
+                                                                                                    value: "false",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                            ],
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            },
                                                         ),
-                                                    },
-                                                ],
-                                            },
+                                                    ),
+                                                },
+                                            ),
                                         ),
                                     },
                                 ),
-                            },
-                        ),
-                    },
-                ],
-            },
-        },
-    ],
-}
+                            ],
+                        },
+                    ),
+                },
+            ),
+        ],
+    },
+)
