@@ -6,7 +6,7 @@
 #![test_runner(datatest::runner)]
 
 use pretty_assertions::assert_eq;
-use roblox_rs::transformer;
+use luau_rs::transformer;
 use syn::{parse_file, File};
 
 #[datatest::files("tests/data", {
