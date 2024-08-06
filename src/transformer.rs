@@ -1,6 +1,7 @@
 use crate::luau::{LuauNode, LuauParam, LuauType};
 use syn::{
-    BinOp, Block, Expr, ExprIf, ExprReturn, File, FnArg, Item, ItemFn, Lit, Pat, ReturnType, Stmt, Type, UnOp
+    BinOp, Block, Expr, ExprForLoop, ExprIf, ExprReturn, File, FnArg, Item, ItemFn, Lit, Pat,
+    ReturnType, Stmt, Type, UnOp,
 };
 
 pub fn transform_file_to_luau(file: &File) -> LuauNode {
@@ -178,6 +179,14 @@ fn transform_if_expr(expr_if: &ExprIf) -> LuauNode {
     }
 }
 
+fn transform_for_loop(expr_for: &ExprForLoop) -> LuauNode {
+    let vars = vec![extract_pat_ident_name(&expr_for.pat)];
+    let iter = Box::new(transform_expr_to_luau(&expr_for.expr));
+    let body = Box::new(transform_block_to_luau(&expr_for.body));
+
+    LuauNode::ForIn { vars, iter, body }
+}
+
 fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
     match expr {
         Expr::Lit(expr_lit) => match &expr_lit.lit {
@@ -186,7 +195,7 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
             Lit::Str(lit_str) => LuauNode::Value(lit_str.value()),
 
             _ => unimplemented!(),
-        }
+        },
 
         Expr::Call(expr_call) => {
             let func_name = if let Expr::Path(expr_path) = &*expr_call.func {
@@ -270,6 +279,19 @@ fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
 
         Expr::Block(expr_block) => transform_block_to_luau(&expr_block.block),
         Expr::If(expr_if) => transform_if_expr(expr_if),
+        Expr::ForLoop(expr_for) => transform_for_loop(expr_for),
+        Expr::Range(expr_range) => {
+            let start = expr_range
+                .start
+                .as_ref()
+                .map(|s| Box::new(transform_expr_to_luau(s)));
+            let end = expr_range
+                .end
+                .as_ref()
+                .map(|e| Box::new(transform_expr_to_luau(e)));
+
+            LuauNode::Range { start, end }
+        }
 
         _ => panic!("unsupported expression type: {:?}", expr),
     }

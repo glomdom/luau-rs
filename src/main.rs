@@ -6,8 +6,8 @@ mod transformer;
 
 fn main() {
     let code = quote! {
-        fn add(a: i32, b: i32) -> i32 {
-            a + b
+        fn main() {
+            for x in 1..12 {}
         }
     };
 
