@@ -1,0 +1,62 @@
+Block(
+    Block {
+        statements: [
+            Function(
+                Function {
+                    name: "main",
+                    params: [],
+                    ret_type: None,
+                    body: Block(
+                        Block {
+                            statements: [
+                                Let(
+                                    Let {
+                                        name: "arr",
+                                        expr: Array(
+                                            Array {
+                                                elements: [
+                                                    Value(
+                                                        Value {
+                                                            value: "1",
+                                                        },
+                                                    ),
+                                                    Value(
+                                                        Value {
+                                                            value: "2",
+                                                        },
+                                                    ),
+                                                    Value(
+                                                        Value {
+                                                            value: "3",
+                                                        },
+                                                    ),
+                                                ],
+                                            },
+                                        ),
+                                    },
+                                ),
+                                ForIn(
+                                    ForIn {
+                                        vars: [
+                                            "x",
+                                        ],
+                                        iter: Value(
+                                            Value {
+                                                value: "arr",
+                                            },
+                                        ),
+                                        body: Block(
+                                            Block {
+                                                statements: [],
+                                            },
+                                        ),
+                                    },
+                                ),
+                            ],
+                        },
+                    ),
+                },
+            ),
+        ],
+    },
+)

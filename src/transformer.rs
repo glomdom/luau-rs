@@ -1,4 +1,4 @@
-use crate::luau::{BinaryOp, Block, Call, Deref, ForIn, Function, If, Let, LuauNode, LuauParam, LuauType, Range, Ref, Return, Value};
+use crate::luau::{Array, BinaryOp, Block, Call, Deref, ForIn, Function, If, Let, LuauNode, LuauParam, LuauType, Range, Ref, Return, Value};
 use syn::{
     BinOp, Expr, ExprForLoop, ExprIf, ExprReturn, File, FnArg, Item, ItemFn, Lit, Pat,
     ReturnType, Stmt, Type, UnOp,
@@ -186,6 +186,12 @@ fn transform_for_loop(expr_for: &ExprForLoop) -> LuauNode {
 
 fn transform_expr_to_luau(expr: &Expr) -> LuauNode {
     match expr {
+        Expr::Array(expr_array) => {
+            let elements = expr_array.elems.iter().map(transform_expr_to_luau).collect();
+
+            LuauNode::Array(Array { elements })
+        }
+
         Expr::Lit(expr_lit) => match &expr_lit.lit {
             Lit::Int(lit_int) => LuauNode::Value(Value { value: lit_int.base10_digits().to_string() }),
             Lit::Bool(lit_bool) => LuauNode::Value(Value { value: lit_bool.value.to_string() }),

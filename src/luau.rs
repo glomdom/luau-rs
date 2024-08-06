@@ -1,6 +1,11 @@
 #![allow(dead_code)]
 
 #[derive(Debug)]
+pub struct Array {
+    pub elements: Vec<LuauNode>,
+}
+
+#[derive(Debug)]
 pub struct BinaryOp {
     pub op: String,
     pub left: Box<LuauNode>,
@@ -82,6 +87,7 @@ pub struct Value {
 /// Enum encapsulating every Luau node.
 #[derive(Debug)]
 pub enum LuauNode {
+    Array(Array),
     BinaryOp(BinaryOp),
     Block(Block),
     Call(Call),
