@@ -1,5 +1,5 @@
 [package]
-name = "roblox-rs"
+name = "luau-rs"
 description = "Rust to a made-up Luau AST."
 license = "EUPL-1.2"
 homepage = "https://github.com/glomdom/luau-rs"
