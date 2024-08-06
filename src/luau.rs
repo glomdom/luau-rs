@@ -35,7 +35,7 @@ pub struct Range {
 }
 
 #[derive(Debug)]
-pub struct ForIn {
+pub struct For {
     pub vars: Vec<String>,
     pub iter: Box<LuauNode>,
     pub body: Box<LuauNode>,
@@ -44,7 +44,7 @@ pub struct ForIn {
 #[derive(Debug)]
 pub struct Function {
     pub name: String,
-    pub params: Vec<LuauParam>,
+    pub params: Vec<Param>,
     pub ret_type: Option<LuauType>,
     pub body: Box<LuauNode>,
 }
@@ -84,6 +84,12 @@ pub struct Value {
     pub value: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct Param {
+    pub name: String,
+    pub typ: LuauType,
+}
+
 /// Enum encapsulating every Luau node.
 #[derive(Debug)]
 pub enum LuauNode {
@@ -93,20 +99,15 @@ pub enum LuauNode {
     Call(Call),
     Deref(Deref),
     Range(Range),
-    ForIn(ForIn),
+    For(For),
     Function(Function),
     If(If),
     Let(Let),
     Ref(Ref),
     Return(Return),
     While(While),
+    Param(Param),
     Value(Value),
-}
-
-#[derive(Debug)]
-pub struct LuauParam {
-    pub name: String,
-    pub typ: LuauType,
 }
 
 #[derive(Debug)]
@@ -115,7 +116,7 @@ pub struct LuauField {
     pub typ: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LuauType {
     pub type_name: String,
     pub is_mut: bool,
