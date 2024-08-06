@@ -5,7 +5,7 @@ Block(
                 Function {
                     name: "add",
                     params: [
-                        LuauParam {
+                        Param {
                             name: "a",
                             typ: LuauType {
                                 type_name: "number",
@@ -13,7 +13,7 @@ Block(
                                 is_ref: false,
                             },
                         },
-                        LuauParam {
+                        Param {
                             name: "b",
                             typ: LuauType {
                                 type_name: "number",
